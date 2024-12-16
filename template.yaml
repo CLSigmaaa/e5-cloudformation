@@ -149,9 +149,8 @@ Resources:
     Properties:
       RestApiId: !Ref ApiGateway
       StageName: prod
-
-  # M2M Cognito User Pool
-  CognitoUserPool:
+  
+  UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
       UsernameConfiguration: 
@@ -169,10 +168,10 @@ Resources:
           Mutable: true
           Required: true
 
-  CognitoUserPoolClient:
+  UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
-      UserPoolId: !Ref CognitoUserPool
+      UserPoolId: !Ref UserPool
       AllowedOAuthFlowsUserPoolClient: true
       CallbackURLs:
         - http://localhost:3000
@@ -180,19 +179,18 @@ Resources:
         - code
         - implicit
       AllowedOAuthScopes:
-        - openid
-        - email
         - phone
+        - email
+        - openid
         - profile
       SupportedIdentityProviders:
         - COGNITO
 
-  # domain
-  CognitoUserPoolDomain:
+  UserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties:
-      Domain: my-user-pool-domain
-      UserPoolId: !Ref CognitoUserPool
+      Domain: !Ref CognitoDomain
+      UserPoolId: !Ref UserPool
 
 
   ApiGatewayCognitoAuthorizer:
