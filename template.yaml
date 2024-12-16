@@ -37,19 +37,19 @@ Resources:
                   - logs:PutLogEvents
                 Resource: "arn:aws:logs:*:*:*"
 
-    LambdaInvokePolicy:
-      Type: AWS::IAM::Policy
-      Properties:
-        PolicyName: LambdaInvokePolicy
-        PolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Action:
-                - lambda:InvokeFunction
-              Resource: !GetAtt MyLambdaFunction.Arn
-        Roles:
-          - !Ref LambdaExecutionRole
+  LambdaInvokePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: LambdaInvokePolicy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - lambda:InvokeFunction
+            Resource: !GetAtt MyLambdaFunction.Arn
+      Roles:
+        - !Ref LambdaExecutionRole
 
   ApiGateway:
     Type: AWS::ApiGateway::RestApi
