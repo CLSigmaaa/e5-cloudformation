@@ -12,7 +12,7 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref MyDynamoDBTable
-      Timeout: 10  # Augmentez le délai d'exécution à 10 secondes
+      Timeout: 10  
       Code:
         ZipFile: |
           import json
@@ -36,8 +36,6 @@ Resources:
                       item = {
                           'id': body['id'],
                           'username': body['username'],
-                          'age': body['age'],
-                          'email': body['email']
                       }
                       table.put_item(Item=item)
                       return {
