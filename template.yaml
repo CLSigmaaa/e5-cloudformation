@@ -162,9 +162,7 @@ Resources:
       ClientName: MyUserPoolClient
       UserPoolId: !Ref CognitoUserPool
       GenerateSecret: true
-      AllowedOAuthScopes:
-        - openid
-  # domain
+
   CognitoUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties:
