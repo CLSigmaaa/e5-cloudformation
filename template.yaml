@@ -41,18 +41,6 @@ Resources:
                   - "logs:PutLogEvents"
                 Resource: "arn:aws:logs:*:*:*"
 
-  # ApiGateway:
-  #   Type: AWS::ApiGateway::RestApi
-  #   Properties:
-  #     Name: MyApiGateway
-
-  # ApiGatewayResource:
-  #   Type: AWS::ApiGateway::Resource
-  #   Properties:
-  #     ParentId: !GetAtt ApiGateway.RootResourceId
-  #     PathPart: hello
-  #     RestApiId: !Ref ApiGateway
-
   OrientApiGateway:
     Type: AWS::ApiGateway::RestApi
     Properties:
