@@ -166,8 +166,6 @@ Resources:
         - client_credentials
       AllowedOAuthScopes:
         - openid
-        - email
-        - profile
   # domain
   CognitoUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
