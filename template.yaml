@@ -41,36 +41,56 @@ Resources:
                   - "logs:PutLogEvents"
                 Resource: "arn:aws:logs:*:*:*"
 
-  ApiGateway:
+  # ApiGateway:
+  #   Type: AWS::ApiGateway::RestApi
+  #   Properties:
+  #     Name: MyApiGateway
+
+  # ApiGatewayResource:
+  #   Type: AWS::ApiGateway::Resource
+  #   Properties:
+  #     ParentId: !GetAtt ApiGateway.RootResourceId
+  #     PathPart: hello
+  #     RestApiId: !Ref ApiGateway
+
+  OrientApiGateway:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      Name: MyApiGateway
+      Name: OrientApi
 
-  ApiGatewayResource:
+  OrientApiGatewayResource:
     Type: AWS::ApiGateway::Resource
     Properties:
-      ParentId: !GetAtt ApiGateway.RootResourceId
-      PathPart: hello
-      RestApiId: !Ref ApiGateway
+      ParentId: !GetAtt OrientApiGateway.RootResourceId
+      PathPart: intranet
+      RestApiId: !Ref OrientApiGateway
 
-  ApiGatewayMethod:
+  OrientApiGatewayMethod:
     Type: AWS::ApiGateway::Method
     Properties:
-      RestApiId: !Ref ApiGateway
-      ResourceId: !Ref ApiGatewayResource
-      HttpMethod: GET
-      AuthorizationType: NONE
+      RestApiId: !Ref OrientApiGateway
+      ResourceId: !Ref OrientApiGatewayResource
+      HttpMethod: POST
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref OrientApiCognitoAuthorizer
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: 
-          Fn::Sub: 
-            - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations
-            - {
-                LambdaArn: !GetAtt MyLambdaFunction.Arn
-              }
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OrientGetEmployesLambda.Arn}/invocations"
+
+    OrientGetEmployesLambda:
+      Type: AWS::Lambda::Function
+      Properties: 
+        FunctionName: OrientGetEmployes
+        Handler: index.handler
+        Runtime: python3.8
+        Role: !GetAtt OrientLambdaExecutionRole.Arn
+        Code:
+          ZipFile: |
+            def handler(event, context):
+                return {"statusCode": 200, "body": "Liste des employés"}
 
 Outputs:
   ApiUrl:
     Description: "API Gateway endpoint"
-    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/hello"
+    Value: !Sub "https://${OrientApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/hello"
