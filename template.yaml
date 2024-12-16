@@ -1,47 +1,5 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: Basic CloudFormation template for API Gateway with Lambda function
-
 Resources:
-  MyLambdaFunction:
-    Type: AWS::Lambda::Function
-    Properties:
-      FunctionName: MyLambdaFunction
-      Runtime: nodejs18.x
-      Handler: index.handler
-      Role: !GetAtt OrientLambdaExecutionRole.Arn
-      Code:
-        ZipFile: |
-          exports.handler = async (event) => {
-            return {
-              statusCode: 200,
-              body: JSON.stringify({ message: "Hello from Lambda!" }),
-            };
-          };
-
-  OrientLambdaExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: OrientLambdaExecutionRole
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: "sts:AssumeRole"
-      Policies:
-        - PolicyName: OrientLambdaExecutionPolicy
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "logs:CreateLogGroup"
-                  - "logs:CreateLogStream"
-                  - "logs:PutLogEvents"
-                Resource: "arn:aws:logs:*:*:*"
-
-  OrientApiGateway:
+  OrientApi:
     Type: AWS::ApiGateway::RestApi
     Properties:
       Name: OrientApi
@@ -66,17 +24,40 @@ Resources:
         IntegrationHttpMethod: POST
         Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OrientGetEmployesLambda.Arn}/invocations"
 
-    OrientGetEmployesLambda:
-      Type: AWS::Lambda::Function
-      Properties: 
-        FunctionName: OrientGetEmployes
-        Handler: index.handler
-        Runtime: python3.8
-        Role: !GetAtt OrientLambdaExecutionRole.Arn
-        Code:
-          ZipFile: |
-            def handler(event, context):
-                return {"statusCode": 200, "body": "Liste des employés"}
+  OrientGetEmployesLambda:
+    Type: AWS::Lambda::Function
+    Properties: 
+      FunctionName: OrientGetEmployes
+      Handler: index.handler
+      Runtime: python3.8
+      Role: !GetAtt OrientLambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          def handler(event, context):
+              return {"statusCode": 200, "body": "Liste des employés"}
+
+  OrientLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaExecutionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - s3:PutObjectAcl
+                Resource: "*"
 
 Outputs:
   ApiUrl:
