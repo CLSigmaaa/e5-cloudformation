@@ -180,9 +180,9 @@ Resources:
         - code
         - implicit
       AllowedOAuthScopes:
-        - phone
-        - email
         - openid
+        - email
+        - phone
         - profile
       SupportedIdentityProviders:
         - COGNITO
