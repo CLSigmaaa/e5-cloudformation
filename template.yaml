@@ -26,28 +26,24 @@ Resources:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: LambdaExecutionPolicy
+        - PolicyName: LambdaBasicExecution
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
-                  - "logs:CreateLogGroup"
-                  - "logs:CreateLogStream"
-                  - "logs:PutLogEvents"
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
                 Resource: "arn:aws:logs:*:*:*"
-
-  LambdaExecutionPolicy:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: !Ref MyLambdaFunction
-      Action: lambda:InvokeFunction
-      Principal: apigateway.amazonaws.com
 
   ApiGateway:
     Type: AWS::ApiGateway::RestApi
     Properties:
       Name: MyApiGateway
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
 
   ApiGatewayResource:
     Type: AWS::ApiGateway::Resource
@@ -75,6 +71,12 @@ Resources:
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*"
+
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref ApiGateway
+      StageName: prod
 
 Outputs:
   ApiUrl:
