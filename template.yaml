@@ -160,7 +160,7 @@ Resources:
     Properties:
       ClientName: MyUserPoolClient
       UserPoolId: !Ref CognitoUserPool
-      GenerateSecret: false
+      GenerateSecret: true
 
   ApiGatewayCognitoAuthorizer:
     Type: AWS::ApiGateway::Authorizer
