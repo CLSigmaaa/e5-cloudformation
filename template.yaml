@@ -175,6 +175,13 @@ Resources:
         - https://example.com/callback
       LogoutURLs:
         - https://example.com/logout
+  
+  # domain
+  CognitoUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: my-user-pool-domain
+      UserPoolId: !Ref CognitoUserPool
 
 
   ApiGatewayCognitoAuthorizer:
@@ -191,3 +198,12 @@ Outputs:
   ApiUrl:
     Description: "API Gateway endpoint"
     Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/users"
+  ClientId:
+    Description: "Cognito User Pool Client ID"
+    Value: !Ref CognitoUserPoolClient
+  ClientSecret:
+    Description: "Cognito User Pool Client Secret"
+    Value: !GetAtt CognitoUserPoolClient.ClientSecret
+  ClientDomainprefix:
+    Description: "Cognito User Pool Domain Prefix"
+    Value: !Ref CognitoUserPoolDomain
