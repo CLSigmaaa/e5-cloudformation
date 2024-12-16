@@ -161,6 +161,8 @@ Resources:
       ClientName: MyUserPoolClient
       UserPoolId: !Ref CognitoUserPool
       GenerateSecret: true
+      AllowedOAuthFlows:
+        - client_credentials
 
   ApiGatewayCognitoAuthorizer:
     Type: AWS::ApiGateway::Authorizer
