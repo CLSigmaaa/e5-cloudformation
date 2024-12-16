@@ -73,4 +73,4 @@ Resources:
 Outputs:
   ApiUrl:
     Description: "API Gateway endpoint"
-    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/hello"
