@@ -54,7 +54,7 @@ Resources:
     Properties:
       RestApiId: !Ref ApiGateway
       ResourceId: !Ref ApiGatewayResource
-      HttpMethod: POST
+      HttpMethod: GET
       AuthorizationType: None
       Integration:
         Type: AWS_PROXY
