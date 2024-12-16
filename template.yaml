@@ -65,6 +65,9 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                   - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:Query
                 Resource: "*"
 
   ApiGateway:
