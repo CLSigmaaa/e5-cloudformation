@@ -4,19 +4,15 @@ Description: Basic CloudFormation template for API Gateway with Lambda function
 Resources:
   MyLambdaFunction:
     Type: AWS::Lambda::Function
-    Properties:
+    Properties: 
       FunctionName: MyLambdaFunction
-      Runtime: nodejs18.x
       Handler: index.handler
+      Runtime: python3.8
       Role: !GetAtt LambdaExecutionRole.Arn
       Code:
         ZipFile: |
-          exports.handler = async (event) => {
-            return {
-              statusCode: 200,
-              body: JSON.stringify({ message: "Hello from Lambda!" }),
-            };
-          };
+          def handler(event, context):
+              return {"statusCode": 200, "body": "Liste des employés"}
 
   LambdaExecutionRole:
     Type: AWS::IAM::Role
@@ -58,8 +54,9 @@ Resources:
     Properties:
       RestApiId: !Ref ApiGateway
       ResourceId: !Ref ApiGatewayResource
-      HttpMethod: GET
-      AuthorizationType: None
+      HttpMethod: POST
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref ApiCognitoAuthorizer
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
