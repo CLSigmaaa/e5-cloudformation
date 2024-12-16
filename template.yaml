@@ -37,6 +37,13 @@ Resources:
                   - "logs:PutLogEvents"
                 Resource: "arn:aws:logs:*:*:*"
 
+  LambdaExecutionPolicy:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref MyLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+
   ApiGateway:
     Type: AWS::ApiGateway::RestApi
     Properties:
