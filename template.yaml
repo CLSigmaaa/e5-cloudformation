@@ -70,16 +70,6 @@ Resources:
                 LambdaArn: !GetAtt MyLambdaFunction.Arn
               }
 
-  LambdaPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: !Ref MyLambdaFunction
-      Action: lambda:InvokeFunction
-      Principal: apigateway.amazonaws.com
-      SourceArn:
-        Fn::Sub: 
-          arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*/GET/hello
-
 Outputs:
   ApiUrl:
     Description: "API Gateway endpoint"
