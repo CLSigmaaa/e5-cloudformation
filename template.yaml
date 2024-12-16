@@ -164,8 +164,7 @@ Resources:
       GenerateSecret: true
       AllowedOAuthFlows:
         - client_credentials
-      AllowedOAuthScopes:
-        - openid
+
   # domain
   CognitoUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
