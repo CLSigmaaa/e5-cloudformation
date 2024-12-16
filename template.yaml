@@ -16,7 +16,6 @@ Resources:
         ZipFile: |
           import json
           import boto3
-          import os
           from boto3.dynamodb.conditions import Key
 
           dynamodb = boto3.resource('dynamodb')
@@ -24,24 +23,11 @@ Resources:
 
           def handler(event, context):
               if event['httpMethod'] == 'GET':
-                  response = table.scan()
-                  return {
-                      "statusCode": 200,
-                      "body": json.dumps(response['Items'])
-                  }
+                  return {"statusCode": 200, "body": "Liste des employés"}
               elif event['httpMethod'] == 'POST':
                   body = json.loads(event['body'])
-                  item = {
-                      'id': body['id'],
-                      'username': body['username'],
-                      'age': body['age'],
-                      'email': body['email']
-                  }
-                  table.put_item(Item=item)
-                  return {
-                      "statusCode": 200,
-                      "body": json.dumps(item)
-                  }
+                  table.put_item(Item=body)
+                  return {"statusCode": 200, "body": json.dumps(body)}
 
   MyDynamoDBTable:
     Type: AWS::DynamoDB::Table
@@ -49,8 +35,6 @@ Resources:
       TableName: MyDynamoDBTable
       AttributeDefinitions:
         - AttributeName: id
-          AttributeType: S
-        - AttributeName: username
           AttributeType: S
       KeySchema:
         - AttributeName: id
@@ -139,4 +123,4 @@ Resources:
 Outputs:
   ApiUrl:
     Description: "API Gateway endpoint"
-    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/hello"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/users"
