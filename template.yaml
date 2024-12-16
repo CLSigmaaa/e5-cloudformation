@@ -1,8 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Basic CloudFormation template for API Gateway with Lambda and Cognito
+Description: Basic CloudFormation template for API Gateway with Lambda function
 
 Resources:
-  # Lambda Function
   MyLambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
@@ -15,14 +14,14 @@ Resources:
           exports.handler = async (event) => {
             return {
               statusCode: 200,
-              body: JSON.stringify({ message: "Hello from Lambda with Cognito Auth!" }),
+              body: JSON.stringify({ message: "Hello from Lambda!" }),
             };
           };
 
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "LambdaExecutionRole-${AWS::StackName}"  # Rend le nom unique avec le nom de la stack
+      RoleName: LambdaExecutionRole
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -42,42 +41,6 @@ Resources:
                   - logs:PutLogEvents
                 Resource: "arn:aws:logs:*:*:*"
 
-
-  # Cognito User Pool
-  CognitoUserPool:
-    Type: AWS::Cognito::UserPool
-    Properties:
-      UserPoolName: MyUserPool
-      AutoVerifiedAttributes:
-        - email
-      Policies:
-        PasswordPolicy:
-          MinimumLength: 8
-          RequireUppercase: true
-          RequireLowercase: true
-          RequireNumbers: true
-          RequireSymbols: false
-
-  # Cognito User Pool Client
-  CognitoUserPoolClient:
-    Type: AWS::Cognito::UserPoolClient
-    Properties:
-      ClientName: MyUserPoolClient
-      UserPoolId: !Ref CognitoUserPool
-      GenerateSecret: false
-      AllowedOAuthFlowsUserPoolClient: true
-      AllowedOAuthFlows:
-        - implicit
-      AllowedOAuthScopes:
-        - email
-        - openid
-        - profile
-      CallbackURLs:
-        - https://example.com/callback # Update with your app's callback URL
-      LogoutURLs:
-        - https://example.com/logout # Update with your app's logout URL
-
-  # API Gateway
   ApiGateway:
     Type: AWS::ApiGateway::RestApi
     Properties:
@@ -87,7 +50,7 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       ParentId: !GetAtt ApiGateway.RootResourceId
-      PathPart: secure
+      PathPart: hello
       RestApiId: !Ref ApiGateway
 
   ApiGatewayMethod:
@@ -96,8 +59,7 @@ Resources:
       RestApiId: !Ref ApiGateway
       ResourceId: !Ref ApiGatewayResource
       HttpMethod: GET
-      AuthorizationType: COGNITO_USER_POOLS
-      AuthorizerId: !Ref ApiGatewayCognitoAuthorizer
+      AuthorizationType: NONE
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
@@ -109,16 +71,6 @@ Resources:
                 LambdaArn: !GetAtt MyLambdaFunction.Arn
               }
 
-  ApiGatewayCognitoAuthorizer:
-    Type: AWS::ApiGateway::Authorizer
-    Properties:
-      Name: CognitoAuthorizer
-      Type: COGNITO_USER_POOLS
-      RestApiId: !Ref ApiGateway
-      IdentitySource: method.request.header.Authorization
-      ProviderARNs:
-        - !GetAtt CognitoUserPool.Arn
-
   LambdaPermission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -127,15 +79,9 @@ Resources:
       Principal: apigateway.amazonaws.com
       SourceArn:
         Fn::Sub: 
-          arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*/GET/secure
+          arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*/GET/hello
 
 Outputs:
   ApiUrl:
-    Description: "Secure API Gateway endpoint"
-    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/secure"
-  CognitoUserPoolId:
-    Description: "Cognito User Pool ID"
-    Value: !Ref CognitoUserPool
-  CognitoUserPoolClientId:
-    Description: "Cognito User Pool Client ID"
-    Value: !Ref CognitoUserPoolClient
+    Description: "API Gateway endpoint"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello"
