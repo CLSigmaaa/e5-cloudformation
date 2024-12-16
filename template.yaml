@@ -1,69 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Basic CloudFormation template for API Gateway with Lambda function
+
 Resources:
-  OrientApi:
-    Type: AWS::ApiGateway::RestApi
-    Properties:
-      Name: OrientApi
-
-  OrientApiGatewayResource:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      ParentId: !GetAtt OrientApiGateway.RootResourceId
-      PathPart: intranet
-      RestApiId: !Ref OrientApiGateway
-
-  OrientApiGatewayMethod:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      RestApiId: !Ref OrientApiGateway
-      ResourceId: !Ref OrientApiGatewayResource
-      HttpMethod: POST
-      AuthorizationType: COGNITO_USER_POOLS
-      AuthorizerId: !Ref OrientApiCognitoAuthorizer
-      Integration:
-        Type: AWS_PROXY
-        IntegrationHttpMethod: POST
-        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OrientGetEmployesLambda.Arn}/invocations"
-
-  OrientGetEmployesLambda:
+  MyLambdaFunction:
     Type: AWS::Lambda::Function
-    Properties: 
-      FunctionName: OrientGetEmployes
+    Properties:
+      FunctionName: MyLambdaFunction
+      Runtime: nodejs18.x
       Handler: index.handler
-      Runtime: python3.8
-      Role: !GetAtt OrientLambdaExecutionRole.Arn
+      Role: !GetAtt LambdaExecutionRole.Arn
       Code:
         ZipFile: |
-          def handler(event, context):
-              return {"statusCode": 200, "body": "Liste des employés"}
+          exports.handler = async (event) => {
+            return {
+              statusCode: 200,
+              body: JSON.stringify({ message: "Hello from Lambda!" }),
+            };
+          };
 
-  OrientLambdaExecutionRole:
+  LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: LambdaExecutionRole
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Principal:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: LambdaExecutionPolicy
+        - PolicyName: LambdaBasicExecution
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                  - s3:PutObject
-                  - s3:PutObjectAcl
-                  - s3:GetObject
-                  - s3:GetObjectAcl
-                  - s3:DeleteObject
-                Resource: "*"
+                Resource: "arn:aws:logs:*:*:*"
+
+  ApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: MyApiGateway
+
+  ApiGatewayResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ApiGateway.RootResourceId
+      PathPart: hello
+      RestApiId: !Ref ApiGateway
+
+  ApiGatewayMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ResourceId: !Ref ApiGatewayResource
+      HttpMethod: POST
+      AuthorizationType: None
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
 
 Outputs:
   ApiUrl:
     Description: "API Gateway endpoint"
-    Value: !Sub "https://${OrientApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/hello"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/hello"
