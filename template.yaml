@@ -12,22 +12,48 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref MyDynamoDBTable
+      Timeout: 10  # Augmentez le délai d'exécution à 10 secondes
       Code:
         ZipFile: |
           import json
           import boto3
+          import os
           from boto3.dynamodb.conditions import Key
 
           dynamodb = boto3.resource('dynamodb')
           table = dynamodb.Table(os.environ['TABLE_NAME'])
 
           def handler(event, context):
-              if event['httpMethod'] == 'GET':
-                  return {"statusCode": 200, "body": "Liste des employés"}
-              elif event['httpMethod'] == 'POST':
-                  body = json.loads(event['body'])
-                  table.put_item(Item=body)
-                  return {"statusCode": 200, "body": json.dumps(body)}
+              try:
+                  if event['httpMethod'] == 'GET':
+                      response = table.scan()
+                      return {
+                          "statusCode": 200,
+                          "body": json.dumps(response['Items'])
+                      }
+                  elif event['httpMethod'] == 'POST':
+                      body = json.loads(event['body'])
+                      item = {
+                          'id': body['id'],
+                          'username': body['username'],
+                          'age': body['age'],
+                          'email': body['email']
+                      }
+                      table.put_item(Item=item)
+                      return {
+                          "statusCode": 200,
+                          "body": json.dumps(item)
+                      }
+                  else:
+                      return {
+                          "statusCode": 400,
+                          "body": json.dumps({"message": "Unsupported method"})
+                      }
+              except Exception as e:
+                  return {
+                      "statusCode": 500,
+                      "body": json.dumps({"message": str(e)})
+                  }
 
   MyDynamoDBTable:
     Type: AWS::DynamoDB::Table
