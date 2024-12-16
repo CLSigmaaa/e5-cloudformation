@@ -150,6 +150,7 @@ Resources:
       RestApiId: !Ref ApiGateway
       StageName: prod
 
+  # M2M Cognito User Pool
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
@@ -163,6 +164,18 @@ Resources:
       GenerateSecret: true
       AllowedOAuthFlows:
         - client_credentials
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes:
+        - openid
+        - email
+        - profile
+      SupportedIdentityProviders:
+        - COGNITO
+      CallbackURLs:
+        - https://example.com/callback
+      LogoutURLs:
+        - https://example.com/logout
+
 
   ApiGatewayCognitoAuthorizer:
     Type: AWS::ApiGateway::Authorizer
