@@ -150,17 +150,106 @@ Resources:
       RestApiId: !Ref ApiGateway
       StageName: prod
 
+  # CognitoUserPool:
+  #   Type: AWS::Cognito::UserPool
+  #   Properties:
+  #     UserPoolName: MyUserPool
+
+  # CognitoUserPoolClient:
+  #   Type: AWS::Cognito::UserPoolClient
+  #   Properties:
+  #     ClientName: MyUserPoolClient
+  #     UserPoolId: !Ref CognitoUserPool
+  #     GenerateSecret: true
+
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: MyUserPool
+      # Enhanced security policies
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+      
+      # Account recovery and MFA
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+      
+      # Multi-factor authentication
+      MfaConfiguration: OPTIONAL
+      
+      # Advanced security features
+      UserPoolAddOns:
+        AdvancedSecurityMode: AUDIT
+      
+      # Schema for custom attributes
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          Mutable: true
+          Required: true
+        - Name: phone_number
+          AttributeDataType: String
+          Mutable: true
+          Required: false
+      
+      # User self-registration
+      UsernameConfiguration:
+        CaseSensitive: false
+      
+      # Verification settings
+      VerificationMessageTemplate:
+        DefaultEmailOption: CONFIRM_WITH_CODE
+      
+      # Auto-verified attributes
+      AutoVerifiedAttributes:
+        - email
 
   CognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
       ClientName: MyUserPoolClient
       UserPoolId: !Ref CognitoUserPool
+      
+      # Generate client secret for added security
       GenerateSecret: true
+      
+      # Supported authentication flows
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      
+      # OAuth configuration
+      AllowedOAuthFlows:
+        - code
+        - implicit
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - profile
+      
+      # Callback and logout URLs
+      CallbackURLs:
+        - https://your-app-domain.com/callback
+        - http://localhost:3000/callback
+      LogoutURLs:
+        - https://your-app-domain.com/logout
+        - http://localhost:3000/logout
+      
+      # Token validity
+      TokenValidityUnits:
+        AccessToken: hours
+        IdToken: hours
+        RefreshToken: days
+      AccessTokenValidity: 1
+      IdTokenValidity: 1
+      RefreshTokenValidity: 30
 
   ApiGatewayCognitoAuthorizer:
     Type: AWS::ApiGateway::Authorizer
