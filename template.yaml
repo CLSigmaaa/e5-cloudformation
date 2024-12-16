@@ -93,7 +93,10 @@ Resources:
                   - dynamodb:UpdateItem
                   - dynamodb:Query
                   - dynamodb:Scan
+                  - s3:PutObject
                   - s3:PutObjectAcl
+                  - s3:GetObject
+                  - s3:ListBucket
                 Resource: "*"
 
   ApiGateway:
