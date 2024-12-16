@@ -93,10 +93,6 @@ Resources:
                   - dynamodb:UpdateItem
                   - dynamodb:Query
                   - dynamodb:Scan
-                  - s3:PutObject
-                  - s3:PutObjectAcl
-                  - s3:GetObject
-                  - s3:ListBucket
                 Resource: "*"
 
   ApiGateway:
@@ -153,8 +149,9 @@ Resources:
     Properties:
       RestApiId: !Ref ApiGateway
       StageName: prod
-  
-  UserPool:
+
+  # M2M Cognito User Pool
+  CognitoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
       UsernameConfiguration: 
@@ -172,29 +169,18 @@ Resources:
           Mutable: true
           Required: true
 
-  UserPoolClient:
+  CognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
-      UserPoolId: !Ref UserPool
-      AllowedOAuthFlowsUserPoolClient: true
-      CallbackURLs:
-        - http://localhost:3000
-      AllowedOAuthFlows:
-        - code
-        - implicit
-      AllowedOAuthScopes:
-        - phone
-        - email
-        - openid
-        - profile
-      SupportedIdentityProviders:
-        - COGNITO
+      ClientName: MyUserPoolClient
+      UserPoolId: !Ref CognitoUserPool
+      GenerateSecret: true 
 
-  UserPoolDomain:
+  CognitoUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties:
-      Domain: !Ref CognitoDomain
-      UserPoolId: !Ref UserPool
+      Domain: my-user-pool-domain
+      UserPoolId: !Ref CognitoUserPool
 
 
   ApiGatewayCognitoAuthorizer:
