@@ -164,18 +164,6 @@ Resources:
       GenerateSecret: true
       AllowedOAuthFlows:
         - client_credentials
-      AllowedOAuthFlowsUserPoolClient: true
-      AllowedOAuthScopes:
-        - openid
-        - email
-        - profile
-      SupportedIdentityProviders:
-        - COGNITO
-      CallbackURLs:
-        - https://example.com/callback
-      LogoutURLs:
-        - https://example.com/logout
-  
   # domain
   CognitoUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
