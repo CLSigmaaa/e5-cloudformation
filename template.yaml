@@ -183,7 +183,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
-      ImageId: ami-0c55b159cbfafe1f0 # AMI Ubuntu 22.04
+      ImageId: ami-0e54671bdf3c8ed8d
       KeyName: orient # Remplacer par votre KeyPair existante
       SecurityGroups:
         - !Ref MySecurityGroup
