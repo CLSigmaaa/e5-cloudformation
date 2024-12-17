@@ -184,7 +184,7 @@ Resources:
     Properties:
       InstanceType: t2.micro
       ImageId: ami-0a628e1e89aaedf80
-      KeyName: orient # Remplacer par votre KeyPair existante
+      KeyName: orient
       SecurityGroups:
         - !Ref MySecurityGroup
       Tags:
@@ -213,7 +213,6 @@ Resources:
           cd /home/ubuntu/spring-app
           mvn clean install
           java -jar target/spring-boot-app-0.0.1-SNAPSHOT.jar
-          
 
           curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
           sudo apt install nodejs -y
