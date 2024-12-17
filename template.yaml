@@ -209,14 +209,7 @@ Resources:
 
           sudo apt install openjdk-17-jdk maven -y
 
-          git clone https://github.com/NeoOniX/AWS-ERP.git /home/ubuntu/spring-boot-app
-          cd /home/ubuntu/spring-boot-app
-          mvn clean install
-          nohup java -jar target/*.jar \
-          --spring.profiles.active=prod \
-          --spring.datasource.url=jdbc:postgresql://${db} \
-          --spring.datasource.username=${db-user} \
-          --spring.datasource.password=${db-password} > /home/ubuntu/spring.log 2>&1 &
+          
 
           curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
           sudo apt install nodejs -y
