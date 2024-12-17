@@ -214,12 +214,13 @@ Resources:
           mvn clean install
           java -jar target/erp-0.0.1.jar &
 
+          git clone https://github.com/shadcn/next-contentlayer.git /home/ubuntu/nextjs-app
+          cd /home/ubuntu/nextjs-app
+          
           curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
           sudo apt-get install -y nodejs
           sudo apt-get install -y npm
-
-          git clone https://github.com/shadcn/next-contentlayer.git /home/ubuntu/nextjs-app
-          cd /home/ubuntu/nextjs-app
+          
           npm install
           npm run build
           npm run start &
