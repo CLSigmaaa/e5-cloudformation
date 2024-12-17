@@ -218,7 +218,7 @@ Resources:
           sudo apt-get install -y nodejs
           sudo apt-get install -y npm
 
-          git clone https://github.com/vercel/nextjs-postgres-nextauth-tailwindcss-template.git /home/ubuntu/nextjs-app
+          git clone https://github.com/shadcn/next-contentlayer.git /home/ubuntu/nextjs-app
           cd /home/ubuntu/nextjs-app
           npm install
           npm run build
