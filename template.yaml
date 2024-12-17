@@ -209,6 +209,10 @@ Resources:
 
           sudo apt install openjdk-17-jdk maven -y
 
+          git clone https://github.com/CLSigmaaa/AWS-ERP-FORK.git /home/ubuntu/spring-app
+          cd /home/ubuntu/spring-app
+          mvn clean install
+          java -jar target/spring-boot-app-0.0.1-SNAPSHOT.jar
           
 
           curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
