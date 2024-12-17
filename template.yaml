@@ -183,7 +183,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
-      ImageId: ami-0e54671bdf3c8ed8d
+      ImageId: ami-0a628e1e89aaedf80
       KeyName: orient # Remplacer par votre KeyPair existante
       SecurityGroups:
         - !Ref MySecurityGroup
@@ -193,9 +193,48 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          apt-get update -y
-          apt-get install openjdk-11-jdk -y
-          apt-get install maven -y
+          sudo apt update -y && sudo apt upgrade -y
+
+          sudo apt install postgresql postgresql-contrib -y
+          sudo systemctl start postgresql
+          sudo systemctl enable postgresql
+          
+          sudo apt install git-all
+
+          sudo -u postgres psql <<EOF
+          CREATE DATABASE myappdb;
+          CREATE USER myappuser WITH ENCRYPTED PASSWORD 'mypassword';
+          GRANT ALL PRIVILEGES ON DATABASE myappdb TO myappuser;
+          EOF
+
+          sudo apt install openjdk-17-jdk maven -y
+
+          git clone https://github.com/NeoOniX/AWS-ERP.git /home/ubuntu/spring-boot-app
+          cd /home/ubuntu/spring-boot-app
+          mvn clean install
+          nohup java -jar target/*.jar \
+          --spring.profiles.active=prod \
+          --spring.datasource.url=jdbc:postgresql://${db} \
+          --spring.datasource.username=${db-user} \
+          --spring.datasource.password=${db-password} > /home/ubuntu/spring.log 2>&1 &
+
+          curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+          sudo apt install nodejs -y
+          sudo npm install -g yarn pm2
+
+          NEXTJS_REPO="https://${GIT_USER}:${GIT_PAT}@github.com/your-repo/nextjs-app.git"
+          git clone ${NEXTJS_REPO} /home/ubuntu/nextjs-app
+          cd /home/ubuntu/nextjs-app
+          yarn install
+          yarn build
+          pm2 start "yarn start" --name "nextjs-app" --watch
+          pm2 save
+
+          sudo ufw allow 22
+          sudo ufw allow 5432
+          sudo ufw allow 8080
+          sudo ufw allow 3000
+          sudo ufw --force enable
 
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
