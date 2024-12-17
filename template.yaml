@@ -215,8 +215,7 @@ Resources:
           java -jar target/erp-0.0.1.jar &
 
           curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-          sudo apt install nodejs -y
-          sudo npm install -g npm@latest
+          sudo apt-get install -y nodejs
 
           git clone https://github.com/vercel/nextjs-postgres-nextauth-tailwindcss-template.git /home/ubuntu/nextjs-app
           cd /home/ubuntu/nextjs-app
