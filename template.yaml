@@ -1,10 +1,10 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Description: Basic CloudFormation template for API Gateway with Lambda function, DynamoDB, and Cognito authentication
 
 Resources:
   MyLambdaFunction:
     Type: AWS::Lambda::Function
-    Properties: 
+    Properties:
       FunctionName: MyLambdaFunction
       Handler: index.handler
       Runtime: python3.8
@@ -12,7 +12,7 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref MyDynamoDBTable
-      Timeout: 10  
+      Timeout: 10
       Code:
         ZipFile: |
           import json
@@ -184,25 +184,18 @@ Resources:
     Properties:
       InstanceType: t2.micro
       ImageId: ami-0c55b159cbfafe1f0 # AMI Ubuntu 22.04
-      KeyName: orient  # Remplacer par votre KeyPair existante
+      KeyName: orient # Remplacer par votre KeyPair existante
       SecurityGroups:
         - !Ref MySecurityGroup
       Tags:
         - Key: Name
           Value: EC2-SpringNextApp
       UserData:
-        UserData:
-          Fn::Base64: !Sub |
-            #!/bin/bash
-            sudo apt update -y && sudo apt upgrade -y
-            sudo apt install postgresql postgresql-contrib -y
-            sudo systemctl start postgresql
-            sudo systemctl enable postgresql
-            sudo -u postgres psql <<EOF
-            CREATE DATABASE myappdb;
-            CREATE USER myappuser WITH ENCRYPTED PASSWORD 'mypassword';
-            GRANT ALL PRIVILEGES ON DATABASE myappdb TO myappuser;
-            EOF
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          apt-get update -y
+          apt-get install openjdk-11-jdk -y
+          apt-get install maven -y
 
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
