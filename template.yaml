@@ -222,8 +222,7 @@ Resources:
           sudo apt install nodejs -y
           sudo npm install -g yarn pm2
 
-          NEXTJS_REPO="https://${GIT_USER}:${GIT_PAT}@github.com/your-repo/nextjs-app.git"
-          git clone ${NEXTJS_REPO} /home/ubuntu/nextjs-app
+          git clone https://github.com/vercel/nextjs-postgres-nextauth-tailwindcss-template.git /home/ubuntu/nextjs-app
           cd /home/ubuntu/nextjs-app
           yarn install
           yarn build
