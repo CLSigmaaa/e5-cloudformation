@@ -94,35 +94,34 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
-
   
-  # ApiGateway:
-  #   Type: AWS::ApiGateway::RestApi
-  #   Properties:
-  #     Name: MyApiGateway
-  #     EndpointConfiguration:
-  #       Types:
-  #         - REGIONAL
+  ApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: MyApiGateway
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
 
-  # ApiGatewayResource:
-  #   Type: AWS::ApiGateway::Resource
-  #   Properties:
-  #     ParentId: !GetAtt ApiGateway.RootResourceId
-  #     PathPart: users
-  #     RestApiId: !Ref ApiGateway
+  ApiGatewayResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ApiGateway.RootResourceId
+      PathPart: users
+      RestApiId: !Ref ApiGateway
 
-  # ApiGatewayMethodGet:
-  #   Type: AWS::ApiGateway::Method
-  #   Properties:
-  #     RestApiId: !Ref ApiGateway
-  #     ResourceId: !Ref ApiGatewayResource
-  #     HttpMethod: GET
-  #     AuthorizationType: COGNITO_USER_POOLS
-  #     AuthorizerId: !Ref ApiGatewayCognitoAuthorizer
-  #     Integration:
-  #       Type: AWS_PROXY
-  #       IntegrationHttpMethod: POST
-  #       Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
+  ApiGatewayMethodGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ResourceId: !Ref ApiGatewayResource
+      HttpMethod: GET
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref ApiGatewayCognitoAuthorizer
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
 
   # ApiGatewayMethodPost:
   #   Type: AWS::ApiGateway::Method
