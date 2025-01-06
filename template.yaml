@@ -123,18 +123,18 @@ Resources:
         IntegrationHttpMethod: POST
         Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
 
-  ApiGatewayMethodPost:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      RestApiId: !Ref ApiGateway
-      ResourceId: !Ref ApiGatewayResource
-      HttpMethod: POST
-      AuthorizationType: COGNITO_USER_POOLS
-      AuthorizerId: !Ref ApiGatewayCognitoAuthorizer
-      Integration:
-        Type: AWS_PROXY
-        IntegrationHttpMethod: POST
-        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
+  # ApiGatewayMethodPost:
+  #   Type: AWS::ApiGateway::Method
+  #   Properties:
+  #     RestApiId: !Ref ApiGateway
+  #     ResourceId: !Ref ApiGatewayResource
+  #     HttpMethod: POST
+  #     AuthorizationType: COGNITO_USER_POOLS
+  #     AuthorizerId: !Ref ApiGatewayCognitoAuthorizer
+  #     Integration:
+  #       Type: AWS_PROXY
+  #       IntegrationHttpMethod: POST
+  #       Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
 
   LambdaInvokePermission:
     Type: AWS::Lambda::Permission
@@ -150,33 +150,33 @@ Resources:
       RestApiId: !Ref ApiGateway
       StageName: prod
 
-  CognitoUserPool:
-    Type: AWS::Cognito::UserPool
-    Properties:
-      UserPoolName: MyUserPool
+  # CognitoUserPool:
+  #   Type: AWS::Cognito::UserPool
+  #   Properties:
+  #     UserPoolName: MyUserPool
 
-  CognitoUserPoolClient:
-    Type: AWS::Cognito::UserPoolClient
-    Properties:
-      ClientName: MyUserPoolClient
-      UserPoolId: !Ref CognitoUserPool
-      GenerateSecret: true
+  # CognitoUserPoolClient:
+  #   Type: AWS::Cognito::UserPoolClient
+  #   Properties:
+  #     ClientName: MyUserPoolClient
+  #     UserPoolId: !Ref CognitoUserPool
+  #     GenerateSecret: true
 
-  CognitoUserPoolDomain:
-    Type: AWS::Cognito::UserPoolDomain
-    Properties:
-      Domain: my-user-pool-domain
-      UserPoolId: !Ref CognitoUserPool
+  # CognitoUserPoolDomain:
+  #   Type: AWS::Cognito::UserPoolDomain
+  #   Properties:
+  #     Domain: my-user-pool-domain
+  #     UserPoolId: !Ref CognitoUserPool
 
-  ApiGatewayCognitoAuthorizer:
-    Type: AWS::ApiGateway::Authorizer
-    Properties:
-      Name: CognitoAuthorizer
-      IdentitySource: method.request.header.Authorization
-      RestApiId: !Ref ApiGateway
-      Type: COGNITO_USER_POOLS
-      ProviderARNs:
-        - !GetAtt CognitoUserPool.Arn
+  # ApiGatewayCognitoAuthorizer:
+  #   Type: AWS::ApiGateway::Authorizer
+  #   Properties:
+  #     Name: CognitoAuthorizer
+  #     IdentitySource: method.request.header.Authorization
+  #     RestApiId: !Ref ApiGateway
+  #     Type: COGNITO_USER_POOLS
+  #     ProviderARNs:
+  #       - !GetAtt CognitoUserPool.Arn
 
   # ec2 instance
   MyEC2Instance:
@@ -225,8 +225,6 @@ Resources:
           npm run build
           npm run start &
           
-          
-          
           sudo ufw allow 22
           sudo ufw allow 5432
           sudo ufw allow 8080
@@ -259,12 +257,12 @@ Outputs:
   ApiUrl:
     Description: "API Gateway endpoint"
     Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/users"
-  ClientId:
-    Description: "Cognito User Pool Client ID"
-    Value: !Ref CognitoUserPoolClient
-  ClientSecret:
-    Description: "Cognito User Pool Client Secret"
-    Value: !GetAtt CognitoUserPoolClient.ClientSecret
-  ClientDomainprefix:
-    Description: "Cognito User Pool Domain Prefix"
-    Value: !Ref CognitoUserPoolDomain
+  # ClientId:
+  #   Description: "Cognito User Pool Client ID"
+  #   Value: !Ref CognitoUserPoolClient
+  # ClientSecret:
+  #   Description: "Cognito User Pool Client Secret"
+  #   Value: !GetAtt CognitoUserPoolClient.ClientSecret
+  # ClientDomainprefix:
+  #   Description: "Cognito User Pool Domain Prefix"
+  #   Value: !Ref CognitoUserPoolDomain
