@@ -2,56 +2,56 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Basic CloudFormation template for API Gateway with Lambda function, DynamoDB, and Cognito authentication
 
 Resources:
-  MyLambdaFunction:
-    Type: AWS::Lambda::Function
-    Properties:
-      FunctionName: MyLambdaFunction
-      Handler: index.handler
-      Runtime: python3.8
-      Role: !GetAtt LambdaExecutionRole.Arn
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref MyDynamoDBTable
-      Timeout: 10
-      Code:
-        ZipFile: |
-          import json
-          import boto3
-          import os
-          from boto3.dynamodb.conditions import Key
+  # MyLambdaFunction:
+  #   Type: AWS::Lambda::Function
+  #   Properties:
+  #     FunctionName: MyLambdaFunction
+  #     Handler: index.handler
+  #     Runtime: python3.8
+  #     Role: !GetAtt LambdaExecutionRole.Arn
+  #     Environment:
+  #       Variables:
+  #         TABLE_NAME: !Ref MyDynamoDBTable
+  #     Timeout: 10
+  #     Code:
+  #       ZipFile: |
+  #         import json
+  #         import boto3
+  #         import os
+  #         from boto3.dynamodb.conditions import Key
 
-          dynamodb = boto3.resource('dynamodb')
-          table = dynamodb.Table(os.environ['TABLE_NAME'])
+  #         dynamodb = boto3.resource('dynamodb')
+  #         table = dynamodb.Table(os.environ['TABLE_NAME'])
 
-          def handler(event, context):
-              try:
-                  if event['httpMethod'] == 'GET':
-                      response = table.scan()
-                      return {
-                          "statusCode": 200,
-                          "body": json.dumps(response['Items'])
-                      }
-                  elif event['httpMethod'] == 'POST':
-                      body = json.loads(event['body'])
-                      item = {
-                          'id': body['id'],
-                          'username': body['username'],
-                      }
-                      table.put_item(Item=item)
-                      return {
-                          "statusCode": 200,
-                          "body": json.dumps(item)
-                      }
-                  else:
-                      return {
-                          "statusCode": 400,
-                          "body": json.dumps({"message": "Unsupported method"})
-                      }
-              except Exception as e:
-                  return {
-                      "statusCode": 500,
-                      "body": json.dumps({"message": str(e)})
-                  }
+  #         def handler(event, context):
+  #             try:
+  #                 if event['httpMethod'] == 'GET':
+  #                     response = table.scan()
+  #                     return {
+  #                         "statusCode": 200,
+  #                         "body": json.dumps(response['Items'])
+  #                     }
+  #                 elif event['httpMethod'] == 'POST':
+  #                     body = json.loads(event['body'])
+  #                     item = {
+  #                         'id': body['id'],
+  #                         'username': body['username'],
+  #                     }
+  #                     table.put_item(Item=item)
+  #                     return {
+  #                         "statusCode": 200,
+  #                         "body": json.dumps(item)
+  #                     }
+  #                 else:
+  #                     return {
+  #                         "statusCode": 400,
+  #                         "body": json.dumps({"message": "Unsupported method"})
+  #                     }
+  #             except Exception as e:
+  #                 return {
+  #                     "statusCode": 500,
+  #                     "body": json.dumps({"message": str(e)})
+  #                 }
 
   MyDynamoDBTable:
     Type: AWS::DynamoDB::Table
@@ -67,61 +67,61 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
 
-  LambdaExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: LambdaExecutionRole
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      Policies:
-        - PolicyName: LambdaBasicExecution
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - logs:CreateLogGroup
-                  - logs:CreateLogStream
-                  - logs:PutLogEvents
-                  - dynamodb:PutItem
-                  - dynamodb:GetItem
-                  - dynamodb:UpdateItem
-                  - dynamodb:Query
-                  - dynamodb:Scan
-                Resource: "*"
+  # LambdaExecutionRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     RoleName: LambdaExecutionRole
+  #     AssumeRolePolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service: lambda.amazonaws.com
+  #           Action: sts:AssumeRole
+  #     Policies:
+  #       - PolicyName: LambdaBasicExecution
+  #         PolicyDocument:
+  #           Version: "2012-10-17"
+  #           Statement:
+  #             - Effect: Allow
+  #               Action:
+  #                 - logs:CreateLogGroup
+  #                 - logs:CreateLogStream
+  #                 - logs:PutLogEvents
+  #                 - dynamodb:PutItem
+  #                 - dynamodb:GetItem
+  #                 - dynamodb:UpdateItem
+  #                 - dynamodb:Query
+  #                 - dynamodb:Scan
+  #               Resource: "*"
 
-  ApiGateway:
-    Type: AWS::ApiGateway::RestApi
-    Properties:
-      Name: MyApiGateway
-      EndpointConfiguration:
-        Types:
-          - REGIONAL
+  # ApiGateway:
+  #   Type: AWS::ApiGateway::RestApi
+  #   Properties:
+  #     Name: MyApiGateway
+  #     EndpointConfiguration:
+  #       Types:
+  #         - REGIONAL
 
-  ApiGatewayResource:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      ParentId: !GetAtt ApiGateway.RootResourceId
-      PathPart: users
-      RestApiId: !Ref ApiGateway
+  # ApiGatewayResource:
+  #   Type: AWS::ApiGateway::Resource
+  #   Properties:
+  #     ParentId: !GetAtt ApiGateway.RootResourceId
+  #     PathPart: users
+  #     RestApiId: !Ref ApiGateway
 
-  ApiGatewayMethodGet:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      RestApiId: !Ref ApiGateway
-      ResourceId: !Ref ApiGatewayResource
-      HttpMethod: GET
-      AuthorizationType: COGNITO_USER_POOLS
-      AuthorizerId: !Ref ApiGatewayCognitoAuthorizer
-      Integration:
-        Type: AWS_PROXY
-        IntegrationHttpMethod: POST
-        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
+  # ApiGatewayMethodGet:
+  #   Type: AWS::ApiGateway::Method
+  #   Properties:
+  #     RestApiId: !Ref ApiGateway
+  #     ResourceId: !Ref ApiGatewayResource
+  #     HttpMethod: GET
+  #     AuthorizationType: COGNITO_USER_POOLS
+  #     AuthorizerId: !Ref ApiGatewayCognitoAuthorizer
+  #     Integration:
+  #       Type: AWS_PROXY
+  #       IntegrationHttpMethod: POST
+  #       Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
 
   # ApiGatewayMethodPost:
   #   Type: AWS::ApiGateway::Method
@@ -136,19 +136,19 @@ Resources:
   #       IntegrationHttpMethod: POST
   #       Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
 
-  LambdaInvokePermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: !Ref MyLambdaFunction
-      Action: lambda:InvokeFunction
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*"
+  # LambdaInvokePermission:
+  #   Type: AWS::Lambda::Permission
+  #   Properties:
+  #     FunctionName: !Ref MyLambdaFunction
+  #     Action: lambda:InvokeFunction
+  #     Principal: apigateway.amazonaws.com
+  #     SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*"
 
-  ApiGatewayDeployment:
-    Type: AWS::ApiGateway::Deployment
-    Properties:
-      RestApiId: !Ref ApiGateway
-      StageName: prod
+  # ApiGatewayDeployment:
+  #   Type: AWS::ApiGateway::Deployment
+  #   Properties:
+  #     RestApiId: !Ref ApiGateway
+  #     StageName: prod
 
   # CognitoUserPool:
   #   Type: AWS::Cognito::UserPool
@@ -179,79 +179,79 @@ Resources:
   #       - !GetAtt CognitoUserPool.Arn
 
   # ec2 instance
-  MyEC2Instance:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: t2.micro
-      ImageId: ami-0a628e1e89aaedf80
-      KeyName: orient
-      SecurityGroups:
-        - !Ref MySecurityGroup
-      Tags:
-        - Key: Name
-          Value: EC2-SpringNextApp
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash
-          sudo apt update -y && sudo apt upgrade -y
+  # MyEC2Instance:
+  #   Type: AWS::EC2::Instance
+  #   Properties:
+  #     InstanceType: t2.micro
+  #     ImageId: ami-0a628e1e89aaedf80
+  #     KeyName: orient
+  #     SecurityGroups:
+  #       - !Ref MySecurityGroup
+  #     Tags:
+  #       - Key: Name
+  #         Value: EC2-SpringNextApp
+  #     UserData:
+  #       Fn::Base64: !Sub |
+  #         #!/bin/bash
+  #         sudo apt update -y && sudo apt upgrade -y
 
-          sudo apt install postgresql postgresql-contrib -y
-          sudo systemctl start postgresql
-          sudo systemctl enable postgresql
+  #         sudo apt install postgresql postgresql-contrib -y
+  #         sudo systemctl start postgresql
+  #         sudo systemctl enable postgresql
           
-          sudo apt install -y git-all
+  #         sudo apt install -y git-all
 
-          sudo -u postgres psql <<EOF
-          CREATE DATABASE myappdb;
-          CREATE USER myappuser WITH ENCRYPTED PASSWORD 'mypassword';
-          GRANT ALL PRIVILEGES ON DATABASE myappdb TO myappuser;
-          EOF
+  #         sudo -u postgres psql <<EOF
+  #         CREATE DATABASE myappdb;
+  #         CREATE USER myappuser WITH ENCRYPTED PASSWORD 'mypassword';
+  #         GRANT ALL PRIVILEGES ON DATABASE myappdb TO myappuser;
+  #         EOF
 
-          sudo apt install openjdk-17-jdk maven -y
+  #         sudo apt install openjdk-17-jdk maven -y
 
-          git clone https://github.com/CLSigmaaa/AWS-ERP-FORK.git /home/ubuntu/spring-app
-          cd /home/ubuntu/spring-app
-          mvn clean install
-          java -jar target/erp-0.0.1.jar &
+  #         git clone https://github.com/CLSigmaaa/AWS-ERP-FORK.git /home/ubuntu/spring-app
+  #         cd /home/ubuntu/spring-app
+  #         mvn clean install
+  #         java -jar target/erp-0.0.1.jar &
 
-          git clone https://github.com/shadcn/next-contentlayer.git /home/ubuntu/nextjs-app
-          cd /home/ubuntu/nextjs-app
+  #         git clone https://github.com/shadcn/next-contentlayer.git /home/ubuntu/nextjs-app
+  #         cd /home/ubuntu/nextjs-app
           
-          curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-          sudo apt-get install -y nodejs
-          sudo apt-get install -y npm
+  #         curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+  #         sudo apt-get install -y nodejs
+  #         sudo apt-get install -y npm
           
-          npm install
-          npm run build
-          npm run start &
+  #         npm install
+  #         npm run build
+  #         npm run start &
           
-          sudo ufw allow 22
-          sudo ufw allow 5432
-          sudo ufw allow 8080
-          sudo ufw allow 3000
-          sudo ufw --force enable
+  #         sudo ufw allow 22
+  #         sudo ufw allow 5432
+  #         sudo ufw allow 8080
+  #         sudo ufw allow 3000
+  #         sudo ufw --force enable
 
-  MySecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Security group for Spring Boot, Next.js, and PostgreSQL
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 5432
-          ToPort: 5432
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 8080
-          ToPort: 8080
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 3000
-          ToPort: 3000
-          CidrIp: 0.0.0.0/0
+  # MySecurityGroup:
+  #   Type: AWS::EC2::SecurityGroup
+  #   Properties:
+  #     GroupDescription: Security group for Spring Boot, Next.js, and PostgreSQL
+  #     SecurityGroupIngress:
+  #       - IpProtocol: tcp
+  #         FromPort: 22
+  #         ToPort: 22
+  #         CidrIp: 0.0.0.0/0
+  #       - IpProtocol: tcp
+  #         FromPort: 5432
+  #         ToPort: 5432
+  #         CidrIp: 0.0.0.0/0
+  #       - IpProtocol: tcp
+  #         FromPort: 8080
+  #         ToPort: 8080
+  #         CidrIp: 0.0.0.0/0
+  #       - IpProtocol: tcp
+  #         FromPort: 3000
+  #         ToPort: 3000
+  #         CidrIp: 0.0.0.0/0
 
 Outputs:
   ApiUrl:
