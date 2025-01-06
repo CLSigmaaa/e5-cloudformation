@@ -28,7 +28,6 @@ Resources:
                   - dynamodb:UpdateItem
                   - dynamodb:Query
                   - dynamodb:Scan
-                  - s3:PutObjectAcl
                 Resource: "*"
 
   MyLambdaFunction:
@@ -92,9 +91,7 @@ Resources:
       KeySchema:
         - AttributeName: id
           KeyType: HASH
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
+      BillingMode: PAY_PER_REQUEST
   
   ApiGateway:
     Type: AWS::ApiGateway::RestApi
@@ -117,8 +114,7 @@ Resources:
       RestApiId: !Ref ApiGateway
       ResourceId: !Ref ApiGatewayResource
       HttpMethod: GET
-      AuthorizationType: COGNITO_USER_POOLS
-      AuthorizerId: !Ref ApiGatewayCognitoAuthorizer
+      AuthorizationType: NONE
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
