@@ -100,6 +100,12 @@ Resources:
       EndpointConfiguration:
         Types:
           - REGIONAL
+  
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref ApiGateway
+      StageName: prod
 
   ApiGatewayResource:
     Type: AWS::ApiGateway::Resource
@@ -140,12 +146,6 @@ Resources:
   #     Action: lambda:InvokeFunction
   #     Principal: apigateway.amazonaws.com
   #     SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*"
-
-  # ApiGatewayDeployment:
-  #   Type: AWS::ApiGateway::Deployment
-  #   Properties:
-  #     RestApiId: !Ref ApiGateway
-  #     StageName: prod
 
   # CognitoUserPool:
   #   Type: AWS::Cognito::UserPool
