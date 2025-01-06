@@ -2,56 +2,84 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Basic CloudFormation template for API Gateway with Lambda function, DynamoDB, and Cognito authentication
 
 Resources:
-  # MyLambdaFunction:
-  #   Type: AWS::Lambda::Function
-  #   Properties:
-  #     FunctionName: MyLambdaFunction
-  #     Handler: index.handler
-  #     Runtime: python3.8
-  #     Role: !GetAtt LambdaExecutionRole.Arn
-  #     Environment:
-  #       Variables:
-  #         TABLE_NAME: !Ref MyDynamoDBTable
-  #     Timeout: 10
-  #     Code:
-  #       ZipFile: |
-  #         import json
-  #         import boto3
-  #         import os
-  #         from boto3.dynamodb.conditions import Key
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: LambdaExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaBasicExecution
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource: "*"
 
-  #         dynamodb = boto3.resource('dynamodb')
-  #         table = dynamodb.Table(os.environ['TABLE_NAME'])
+  MyLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: MyLambdaFunction
+      Handler: index.handler
+      Runtime: python3.8
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref MyDynamoDBTable
+      Timeout: 10
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import os
+          from boto3.dynamodb.conditions import Key
 
-  #         def handler(event, context):
-  #             try:
-  #                 if event['httpMethod'] == 'GET':
-  #                     response = table.scan()
-  #                     return {
-  #                         "statusCode": 200,
-  #                         "body": json.dumps(response['Items'])
-  #                     }
-  #                 elif event['httpMethod'] == 'POST':
-  #                     body = json.loads(event['body'])
-  #                     item = {
-  #                         'id': body['id'],
-  #                         'username': body['username'],
-  #                     }
-  #                     table.put_item(Item=item)
-  #                     return {
-  #                         "statusCode": 200,
-  #                         "body": json.dumps(item)
-  #                     }
-  #                 else:
-  #                     return {
-  #                         "statusCode": 400,
-  #                         "body": json.dumps({"message": "Unsupported method"})
-  #                     }
-  #             except Exception as e:
-  #                 return {
-  #                     "statusCode": 500,
-  #                     "body": json.dumps({"message": str(e)})
-  #                 }
+          dynamodb = boto3.resource('dynamodb')
+          table = dynamodb.Table(os.environ['TABLE_NAME'])
+
+          def handler(event, context):
+              try:
+                  if event['httpMethod'] == 'GET':
+                      response = table.scan()
+                      return {
+                          "statusCode": 200,
+                          "body": json.dumps(response['Items'])
+                      }
+                  elif event['httpMethod'] == 'POST':
+                      body = json.loads(event['body'])
+                      item = {
+                          'id': body['id'],
+                          'username': body['username'],
+                      }
+                      table.put_item(Item=item)
+                      return {
+                          "statusCode": 200,
+                          "body": json.dumps(item)
+                      }
+                  else:
+                      return {
+                          "statusCode": 400,
+                          "body": json.dumps({"message": "Unsupported method"})
+                      }
+              except Exception as e:
+                  return {
+                      "statusCode": 500,
+                      "body": json.dumps({"message": str(e)})
+                  }
 
   MyDynamoDBTable:
     Type: AWS::DynamoDB::Table
@@ -67,34 +95,7 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
 
-  # LambdaExecutionRole:
-  #   Type: AWS::IAM::Role
-  #   Properties:
-  #     RoleName: LambdaExecutionRole
-  #     AssumeRolePolicyDocument:
-  #       Version: "2012-10-17"
-  #       Statement:
-  #         - Effect: Allow
-  #           Principal:
-  #             Service: lambda.amazonaws.com
-  #           Action: sts:AssumeRole
-  #     Policies:
-  #       - PolicyName: LambdaBasicExecution
-  #         PolicyDocument:
-  #           Version: "2012-10-17"
-  #           Statement:
-  #             - Effect: Allow
-  #               Action:
-  #                 - logs:CreateLogGroup
-  #                 - logs:CreateLogStream
-  #                 - logs:PutLogEvents
-  #                 - dynamodb:PutItem
-  #                 - dynamodb:GetItem
-  #                 - dynamodb:UpdateItem
-  #                 - dynamodb:Query
-  #                 - dynamodb:Scan
-  #               Resource: "*"
-
+  
   # ApiGateway:
   #   Type: AWS::ApiGateway::RestApi
   #   Properties:
