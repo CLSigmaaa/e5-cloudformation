@@ -28,6 +28,7 @@ Resources:
                   - dynamodb:UpdateItem
                   - dynamodb:Query
                   - dynamodb:Scan
+                  - s3:PutObjectAcl
                 Resource: "*"
 
   MyLambdaFunction:
