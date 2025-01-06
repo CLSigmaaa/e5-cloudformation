@@ -30,6 +30,14 @@ Resources:
                   - dynamodb:Scan
                 Resource: "*"
 
+    LambdaInvokePermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        FunctionName: !Ref MyLambdaFunction
+        Action: lambda:InvokeFunction
+        Principal: apigateway.amazonaws.com
+        SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*"
+
   MyLambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
@@ -80,6 +88,7 @@ Resources:
                       "statusCode": 500,
                       "body": json.dumps({"message": str(e)})
                   }
+
 
   MyDynamoDBTable:
     Type: AWS::DynamoDB::Table
@@ -139,13 +148,6 @@ Resources:
   #       IntegrationHttpMethod: POST
   #       Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
 
-  # LambdaInvokePermission:
-  #   Type: AWS::Lambda::Permission
-  #   Properties:
-  #     FunctionName: !Ref MyLambdaFunction
-  #     Action: lambda:InvokeFunction
-  #     Principal: apigateway.amazonaws.com
-  #     SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*"
 
   # CognitoUserPool:
   #   Type: AWS::Cognito::UserPool
