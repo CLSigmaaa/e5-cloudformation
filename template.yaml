@@ -218,10 +218,13 @@ Resources:
           curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
           sudo apt-get install -y nodejs
           sudo apt-get install -y npm
+
+          sudo npm install -g pm2
           
-          npm install
-          npm run build
-          npm run start
+          sudo npm install
+          sudo npm run build
+          sudo pm2 start npm --name "nextjs-app" -- start
+          sudo pm2 save
           
           sudo ufw allow 22
           sudo ufw allow 5432
