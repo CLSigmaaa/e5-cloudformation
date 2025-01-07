@@ -176,7 +176,7 @@ Resources:
   #       - !GetAtt CognitoUserPool.Arn
 
   # ec2 instance
-  JeanNeymar:
+  MyEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
