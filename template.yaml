@@ -2,6 +2,18 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Basic CloudFormation template for API Gateway with Lambda function, DynamoDB, and Cognito authentication
 
 Resources:
+  MyDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: MyDynamoDBTable
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+  
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -29,14 +41,6 @@ Resources:
                   - dynamodb:Query
                   - dynamodb:Scan
                 Resource: "*"
-
-  LambdaInvokePermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: !Ref MyLambdaFunction
-      Action: lambda:InvokeFunction
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*"
 
   MyLambdaFunction:
     Type: AWS::Lambda::Function
@@ -89,17 +93,13 @@ Resources:
                       "body": json.dumps({"message": str(e)})
                   }
 
-  MyDynamoDBTable:
-    Type: AWS::DynamoDB::Table
+  LambdaInvokePermission:
+    Type: AWS::Lambda::Permission
     Properties:
-      TableName: MyDynamoDBTable
-      AttributeDefinitions:
-        - AttributeName: id
-          AttributeType: S
-      KeySchema:
-        - AttributeName: id
-          KeyType: HASH
-      BillingMode: PAY_PER_REQUEST
+      FunctionName: !Ref MyLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*"
   
   ApiGateway:
     Type: AWS::ApiGateway::RestApi
@@ -108,12 +108,6 @@ Resources:
       EndpointConfiguration:
         Types:
           - REGIONAL
-  
-  ApiGatewayDeployment:
-    Type: AWS::ApiGateway::Deployment
-    Properties:
-      RestApiId: !Ref ApiGateway
-      StageName: prod
 
   ApiGatewayResource:
     Type: AWS::ApiGateway::Resource
@@ -145,6 +139,15 @@ Resources:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
         Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
+  
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - ApiGatewayMethodGet
+      - ApiGatewayMethodPost
+    Properties:
+      RestApiId: !Ref ApiGateway
+      StageName: prod
 
   MyEC2Instance:
     Type: AWS::EC2::Instance
