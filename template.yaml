@@ -2,43 +2,43 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Basic CloudFormation template for API Gateway with Lambda function, DynamoDB, and Cognito authentication
 
 Resources:
-  # LambdaExecutionRole:
-  #   Type: AWS::IAM::Role
-  #   Properties:
-  #     RoleName: LambdaExecutionRole
-  #     AssumeRolePolicyDocument:
-  #       Version: "2012-10-17"
-  #       Statement:
-  #         - Effect: Allow
-  #           Principal:
-  #             Service: lambda.amazonaws.com
-  #           Action: sts:AssumeRole
-  #     Policies:
-  #       - PolicyName: LambdaBasicExecution
-  #         PolicyDocument:
-  #           Version: "2012-10-17"
-  #           Statement:
-  #             - Effect: Allow
-  #               Action:
-  #                 - logs:CreateLogGroup
-  #                 - logs:CreateLogStream
-  #                 - logs:PutLogEvents
-  #                 - dynamodb:PutItem
-  #                 - dynamodb:GetItem
-  #                 - dynamodb:UpdateItem
-  #                 - dynamodb:Query
-  #                 - dynamodb:Scan
-  #               Resource: "*"
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: LambdaExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaBasicExecution
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource: "*"
 
-  # LambdaInvokePermission:
-  #   Type: AWS::Lambda::Permission
-  #   Properties:
-  #     FunctionName: !Ref MyLambdaFunction
-  #     Action: lambda:InvokeFunction
-  #     Principal: apigateway.amazonaws.com
-  #     SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*"
+  LambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref MyLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*"
 
-  # MyLambdaFunction:
+  MyLambdaFunction:
   #   Type: AWS::Lambda::Function
   #   Properties:
   #     FunctionName: MyLambdaFunction
@@ -101,109 +101,109 @@ Resources:
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
   
-  # ApiGateway:
-  #   Type: AWS::ApiGateway::RestApi
-  #   Properties:
-  #     Name: MyApiGateway
-  #     EndpointConfiguration:
-  #       Types:
-  #         - REGIONAL
+  ApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: MyApiGateway
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
   
-  # ApiGatewayDeployment:
-  #   Type: AWS::ApiGateway::Deployment
-  #   Properties:
-  #     RestApiId: !Ref ApiGateway
-  #     StageName: prod
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref ApiGateway
+      StageName: prod
 
-  # ApiGatewayResource:
-  #   Type: AWS::ApiGateway::Resource
-  #   Properties:
-  #     ParentId: !GetAtt ApiGateway.RootResourceId
-  #     PathPart: users
-  #     RestApiId: !Ref ApiGateway
+  ApiGatewayResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ApiGateway.RootResourceId
+      PathPart: users
+      RestApiId: !Ref ApiGateway
 
-  # ApiGatewayMethodGet:
-  #   Type: AWS::ApiGateway::Method
-  #   Properties:
-  #     RestApiId: !Ref ApiGateway
-  #     ResourceId: !Ref ApiGatewayResource
-  #     HttpMethod: GET
-  #     AuthorizationType: NONE
-  #     Integration:
-  #       Type: AWS_PROXY
-  #       IntegrationHttpMethod: POST
-  #       Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
+  ApiGatewayMethodGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ResourceId: !Ref ApiGatewayResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
 
-  # ApiGatewayMethodPost:
-  #   Type: AWS::ApiGateway::Method
-  #   Properties:
-  #     RestApiId: !Ref ApiGateway
-  #     ResourceId: !Ref ApiGatewayResource
-  #     HttpMethod: POST
-  #     AuthorizationType: NONE
-  #     Integration:
-  #       Type: AWS_PROXY
-  #       IntegrationHttpMethod: POST
-  #       Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
+  ApiGatewayMethodPost:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ResourceId: !Ref ApiGatewayResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
 
-  # ec2 instance
-  # MyEC2Instance:
-  #   Type: AWS::EC2::Instance
-  #   Properties:
-  #     InstanceType: t2.micro
-  #     ImageId: ami-0a628e1e89aaedf80
-  #     KeyName: orient
-  #     SecurityGroups:
-  #       - !Ref MySecurityGroup
-  #     Tags:
-  #       - Key: Name
-  #         Value: EC2-SpringNextApp
-  #     UserData:
-  #       Fn::Base64: !Sub |
-  #         #!/bin/bash
-  #         sudo apt update -y && sudo apt upgrade -y
+  ec2 instance
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0a628e1e89aaedf80
+      KeyName: orient
+      SecurityGroups:
+        - !Ref MySecurityGroup
+      Tags:
+        - Key: Name
+          Value: EC2-SpringNextApp
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo apt update -y && sudo apt upgrade -y
 
-  #         sudo apt install postgresql postgresql-contrib -y
-  #         sudo systemctl start postgresql
-  #         sudo systemctl enable postgresql
+          sudo apt install postgresql postgresql-contrib -y
+          sudo systemctl start postgresql
+          sudo systemctl enable postgresql
           
-  #         sudo apt install -y git-all
+          sudo apt install -y git-all
 
-  #         sudo -u postgres psql <<EOF
-  #         CREATE DATABASE myappdb;
-  #         CREATE USER myappuser WITH ENCRYPTED PASSWORD 'mypassword';
-  #         GRANT ALL PRIVILEGES ON DATABASE myappdb TO myappuser;
-  #         EOF
+          sudo -u postgres psql <<EOF
+          CREATE DATABASE myappdb;
+          CREATE USER myappuser WITH ENCRYPTED PASSWORD 'mypassword';
+          GRANT ALL PRIVILEGES ON DATABASE myappdb TO myappuser;
+          EOF
 
-  #         sudo apt install openjdk-17-jdk maven -y
+          sudo apt install openjdk-17-jdk maven -y
 
-  #         git clone https://github.com/CLSigmaaa/AWS-ERP-FORK.git /home/ubuntu/spring-app
-  #         cd /home/ubuntu/spring-app
-  #         mvn clean install
-  #         mvn package
-  #         java -jar target/erp-0.0.1.jar
+          git clone https://github.com/CLSigmaaa/AWS-ERP-FORK.git /home/ubuntu/spring-app
+          cd /home/ubuntu/spring-app
+          mvn clean install
+          mvn package
+          java -jar target/erp-0.0.1.jar
 
-  #         git clone https://github.com/shadcn/next-contentlayer.git /home/ubuntu/nextjs-app
-  #         cd /home/ubuntu/nextjs-app
+          git clone https://github.com/shadcn/next-contentlayer.git /home/ubuntu/nextjs-app
+          cd /home/ubuntu/nextjs-app
           
-  #         curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-  #         sudo apt-get install -y nodejs
-  #         sudo apt-get install -y npm
+          curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+          sudo apt-get install -y npm
 
-  #         sudo npm install -g pm2
+          sudo npm install -g pm2
           
-  #         sudo npm install
-  #         sudo npm run build
-  #         sudo pm2 start npm --name "nextjs-app" -- start
-  #         sudo pm2 save
+          sudo npm install
+          sudo npm run build
+          sudo pm2 start npm --name "nextjs-app" -- start
+          sudo pm2 save
           
-  #         sudo ufw allow 22
-  #         sudo ufw allow 5432
-  #         sudo ufw allow 8080
-  #         sudo ufw allow 3000
-  #         sudo ufw --force enable
+          sudo ufw allow 22
+          sudo ufw allow 5432
+          sudo ufw allow 8080
+          sudo ufw allow 3000
+          sudo ufw --force enable
 
-  # MySecurityGroup:
+  MySecurityGroup:
   #   Type: AWS::EC2::SecurityGroup
   #   Properties:
   #     GroupDescription: Security group for Spring Boot, Next.js, and PostgreSQL
