@@ -176,79 +176,79 @@ Resources:
   #       - !GetAtt CognitoUserPool.Arn
 
   # ec2 instance
-  # MyEC2Instance:
-  #   Type: AWS::EC2::Instance
-  #   Properties:
-  #     InstanceType: t2.micro
-  #     ImageId: ami-0a628e1e89aaedf80
-  #     KeyName: orient
-  #     SecurityGroups:
-  #       - !Ref MySecurityGroup
-  #     Tags:
-  #       - Key: Name
-  #         Value: EC2-SpringNextApp
-  #     UserData:
-  #       Fn::Base64: !Sub |
-  #         #!/bin/bash
-  #         sudo apt update -y && sudo apt upgrade -y
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0a628e1e89aaedf80
+      KeyName: orient
+      SecurityGroups:
+        - !Ref MySecurityGroup
+      Tags:
+        - Key: Name
+          Value: EC2-SpringNextApp
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo apt update -y && sudo apt upgrade -y
 
-  #         sudo apt install postgresql postgresql-contrib -y
-  #         sudo systemctl start postgresql
-  #         sudo systemctl enable postgresql
+          sudo apt install postgresql postgresql-contrib -y
+          sudo systemctl start postgresql
+          sudo systemctl enable postgresql
           
-  #         sudo apt install -y git-all
+          sudo apt install -y git-all
 
-  #         sudo -u postgres psql <<EOF
-  #         CREATE DATABASE myappdb;
-  #         CREATE USER myappuser WITH ENCRYPTED PASSWORD 'mypassword';
-  #         GRANT ALL PRIVILEGES ON DATABASE myappdb TO myappuser;
-  #         EOF
+          sudo -u postgres psql <<EOF
+          CREATE DATABASE myappdb;
+          CREATE USER myappuser WITH ENCRYPTED PASSWORD 'mypassword';
+          GRANT ALL PRIVILEGES ON DATABASE myappdb TO myappuser;
+          EOF
 
-  #         sudo apt install openjdk-17-jdk maven -y
+          sudo apt install openjdk-17-jdk maven -y
 
-  #         git clone https://github.com/CLSigmaaa/AWS-ERP-FORK.git /home/ubuntu/spring-app
-  #         cd /home/ubuntu/spring-app
-  #         mvn clean install
-  #         java -jar target/erp-0.0.1.jar &
+          git clone https://github.com/CLSigmaaa/AWS-ERP-FORK.git /home/ubuntu/spring-app
+          cd /home/ubuntu/spring-app
+          mvn clean install
+          java -jar target/erp-0.0.1.jar &
 
-  #         git clone https://github.com/shadcn/next-contentlayer.git /home/ubuntu/nextjs-app
-  #         cd /home/ubuntu/nextjs-app
+          git clone https://github.com/shadcn/next-contentlayer.git /home/ubuntu/nextjs-app
+          cd /home/ubuntu/nextjs-app
           
-  #         curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-  #         sudo apt-get install -y nodejs
-  #         sudo apt-get install -y npm
+          curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+          sudo apt-get install -y npm
           
-  #         npm install
-  #         npm run build
-  #         npm run start &
+          npm install
+          npm run build
+          npm run start &
           
-  #         sudo ufw allow 22
-  #         sudo ufw allow 5432
-  #         sudo ufw allow 8080
-  #         sudo ufw allow 3000
-  #         sudo ufw --force enable
+          sudo ufw allow 22
+          sudo ufw allow 5432
+          sudo ufw allow 8080
+          sudo ufw allow 3000
+          sudo ufw --force enable
 
-  # MySecurityGroup:
-  #   Type: AWS::EC2::SecurityGroup
-  #   Properties:
-  #     GroupDescription: Security group for Spring Boot, Next.js, and PostgreSQL
-  #     SecurityGroupIngress:
-  #       - IpProtocol: tcp
-  #         FromPort: 22
-  #         ToPort: 22
-  #         CidrIp: 0.0.0.0/0
-  #       - IpProtocol: tcp
-  #         FromPort: 5432
-  #         ToPort: 5432
-  #         CidrIp: 0.0.0.0/0
-  #       - IpProtocol: tcp
-  #         FromPort: 8080
-  #         ToPort: 8080
-  #         CidrIp: 0.0.0.0/0
-  #       - IpProtocol: tcp
-  #         FromPort: 3000
-  #         ToPort: 3000
-  #         CidrIp: 0.0.0.0/0
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Spring Boot, Next.js, and PostgreSQL
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: 0.0.0.0/0
 
 Outputs:
   ApiUrl:
