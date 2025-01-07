@@ -2,92 +2,92 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Basic CloudFormation template for API Gateway with Lambda function, DynamoDB, and Cognito authentication
 
 Resources:
-  LambdaExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: LambdaExecutionRole
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      Policies:
-        - PolicyName: LambdaBasicExecution
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - logs:CreateLogGroup
-                  - logs:CreateLogStream
-                  - logs:PutLogEvents
-                  - dynamodb:PutItem
-                  - dynamodb:GetItem
-                  - dynamodb:UpdateItem
-                  - dynamodb:Query
-                  - dynamodb:Scan
-                Resource: "*"
+  # LambdaExecutionRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     RoleName: LambdaExecutionRole
+  #     AssumeRolePolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service: lambda.amazonaws.com
+  #           Action: sts:AssumeRole
+  #     Policies:
+  #       - PolicyName: LambdaBasicExecution
+  #         PolicyDocument:
+  #           Version: "2012-10-17"
+  #           Statement:
+  #             - Effect: Allow
+  #               Action:
+  #                 - logs:CreateLogGroup
+  #                 - logs:CreateLogStream
+  #                 - logs:PutLogEvents
+  #                 - dynamodb:PutItem
+  #                 - dynamodb:GetItem
+  #                 - dynamodb:UpdateItem
+  #                 - dynamodb:Query
+  #                 - dynamodb:Scan
+  #               Resource: "*"
 
-  LambdaInvokePermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: !Ref MyLambdaFunction
-      Action: lambda:InvokeFunction
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*"
+  # LambdaInvokePermission:
+  #   Type: AWS::Lambda::Permission
+  #   Properties:
+  #     FunctionName: !Ref MyLambdaFunction
+  #     Action: lambda:InvokeFunction
+  #     Principal: apigateway.amazonaws.com
+  #     SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*"
 
-  MyLambdaFunction:
-    Type: AWS::Lambda::Function
-    Properties:
-      FunctionName: MyLambdaFunction
-      Handler: index.handler
-      Runtime: python3.8
-      Role: !GetAtt LambdaExecutionRole.Arn
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref MyDynamoDBTable
-      Timeout: 10
-      Code:
-        ZipFile: |
-          import json
-          import boto3
-          import os
-          from boto3.dynamodb.conditions import Key
+  # MyLambdaFunction:
+  #   Type: AWS::Lambda::Function
+  #   Properties:
+  #     FunctionName: MyLambdaFunction
+  #     Handler: index.handler
+  #     Runtime: python3.8
+  #     Role: !GetAtt LambdaExecutionRole.Arn
+  #     Environment:
+  #       Variables:
+  #         TABLE_NAME: !Ref MyDynamoDBTable
+  #     Timeout: 10
+  #     Code:
+  #       ZipFile: |
+  #         import json
+  #         import boto3
+  #         import os
+  #         from boto3.dynamodb.conditions import Key
 
-          dynamodb = boto3.resource('dynamodb')
-          table = dynamodb.Table(os.environ['TABLE_NAME'])
+  #         dynamodb = boto3.resource('dynamodb')
+  #         table = dynamodb.Table(os.environ['TABLE_NAME'])
 
-          def handler(event, context):
-              try:
-                  if event['httpMethod'] == 'GET':
-                      response = table.scan()
-                      return {
-                          "statusCode": 200,
-                          "body": json.dumps(response['Items'])
-                      }
-                  elif event['httpMethod'] == 'POST':
-                      body = json.loads(event['body'])
-                      item = {
-                          'id': body['id'],
-                          'username': body['username'],
-                      }
-                      table.put_item(Item=item)
-                      return {
-                          "statusCode": 200,
-                          "body": json.dumps(item)
-                      }
-                  else:
-                      return {
-                          "statusCode": 400,
-                          "body": json.dumps({"message": "Unsupported method"})
-                      }
-              except Exception as e:
-                  return {
-                      "statusCode": 500,
-                      "body": json.dumps({"message": str(e)})
-                  }
+  #         def handler(event, context):
+  #             try:
+  #                 if event['httpMethod'] == 'GET':
+  #                     response = table.scan()
+  #                     return {
+  #                         "statusCode": 200,
+  #                         "body": json.dumps(response['Items'])
+  #                     }
+  #                 elif event['httpMethod'] == 'POST':
+  #                     body = json.loads(event['body'])
+  #                     item = {
+  #                         'id': body['id'],
+  #                         'username': body['username'],
+  #                     }
+  #                     table.put_item(Item=item)
+  #                     return {
+  #                         "statusCode": 200,
+  #                         "body": json.dumps(item)
+  #                     }
+  #                 else:
+  #                     return {
+  #                         "statusCode": 400,
+  #                         "body": json.dumps({"message": "Unsupported method"})
+  #                     }
+  #             except Exception as e:
+  #                 return {
+  #                     "statusCode": 500,
+  #                     "body": json.dumps({"message": str(e)})
+  #                 }
 
   MyDynamoDBTable:
     Type: AWS::DynamoDB::Table
@@ -101,79 +101,50 @@ Resources:
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
   
-  ApiGateway:
-    Type: AWS::ApiGateway::RestApi
-    Properties:
-      Name: MyApiGateway
-      EndpointConfiguration:
-        Types:
-          - REGIONAL
+  # ApiGateway:
+  #   Type: AWS::ApiGateway::RestApi
+  #   Properties:
+  #     Name: MyApiGateway
+  #     EndpointConfiguration:
+  #       Types:
+  #         - REGIONAL
   
-  ApiGatewayDeployment:
-    Type: AWS::ApiGateway::Deployment
-    Properties:
-      RestApiId: !Ref ApiGateway
-      StageName: prod
-
-  ApiGatewayResource:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      ParentId: !GetAtt ApiGateway.RootResourceId
-      PathPart: users
-      RestApiId: !Ref ApiGateway
-
-  ApiGatewayMethodGet:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      RestApiId: !Ref ApiGateway
-      ResourceId: !Ref ApiGatewayResource
-      HttpMethod: GET
-      AuthorizationType: NONE
-      Integration:
-        Type: AWS_PROXY
-        IntegrationHttpMethod: POST
-        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
-
-  ApiGatewayMethodPost:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      RestApiId: !Ref ApiGateway
-      ResourceId: !Ref ApiGatewayResource
-      HttpMethod: POST
-      AuthorizationType: NONE
-      Integration:
-        Type: AWS_PROXY
-        IntegrationHttpMethod: POST
-        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
-
-
-  # CognitoUserPool:
-  #   Type: AWS::Cognito::UserPool
+  # ApiGatewayDeployment:
+  #   Type: AWS::ApiGateway::Deployment
   #   Properties:
-  #     UserPoolName: MyUserPool
-
-  # CognitoUserPoolClient:
-  #   Type: AWS::Cognito::UserPoolClient
-  #   Properties:
-  #     ClientName: MyUserPoolClient
-  #     UserPoolId: !Ref CognitoUserPool
-  #     GenerateSecret: true
-
-  # CognitoUserPoolDomain:
-  #   Type: AWS::Cognito::UserPoolDomain
-  #   Properties:
-  #     Domain: my-user-pool-domain
-  #     UserPoolId: !Ref CognitoUserPool
-
-  # ApiGatewayCognitoAuthorizer:
-  #   Type: AWS::ApiGateway::Authorizer
-  #   Properties:
-  #     Name: CognitoAuthorizer
-  #     IdentitySource: method.request.header.Authorization
   #     RestApiId: !Ref ApiGateway
-  #     Type: COGNITO_USER_POOLS
-  #     ProviderARNs:
-  #       - !GetAtt CognitoUserPool.Arn
+  #     StageName: prod
+
+  # ApiGatewayResource:
+  #   Type: AWS::ApiGateway::Resource
+  #   Properties:
+  #     ParentId: !GetAtt ApiGateway.RootResourceId
+  #     PathPart: users
+  #     RestApiId: !Ref ApiGateway
+
+  # ApiGatewayMethodGet:
+  #   Type: AWS::ApiGateway::Method
+  #   Properties:
+  #     RestApiId: !Ref ApiGateway
+  #     ResourceId: !Ref ApiGatewayResource
+  #     HttpMethod: GET
+  #     AuthorizationType: NONE
+  #     Integration:
+  #       Type: AWS_PROXY
+  #       IntegrationHttpMethod: POST
+  #       Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
+
+  # ApiGatewayMethodPost:
+  #   Type: AWS::ApiGateway::Method
+  #   Properties:
+  #     RestApiId: !Ref ApiGateway
+  #     ResourceId: !Ref ApiGatewayResource
+  #     HttpMethod: POST
+  #     AuthorizationType: NONE
+  #     Integration:
+  #       Type: AWS_PROXY
+  #       IntegrationHttpMethod: POST
+  #       Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations"
 
   # ec2 instance
   # MyEC2Instance:
@@ -258,12 +229,3 @@ Outputs:
   ApiUrl:
     Description: "API Gateway endpoint"
     Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/users"
-  # ClientId:
-  #   Description: "Cognito User Pool Client ID"
-  #   Value: !Ref CognitoUserPoolClient
-  # ClientSecret:
-  #   Description: "Cognito User Pool Client Secret"
-  #   Value: !GetAtt CognitoUserPoolClient.ClientSecret
-  # ClientDomainprefix:
-  #   Description: "Cognito User Pool Domain Prefix"
-  #   Value: !Ref CognitoUserPoolDomain
