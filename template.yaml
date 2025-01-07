@@ -209,7 +209,8 @@ Resources:
           git clone https://github.com/CLSigmaaa/AWS-ERP-FORK.git /home/ubuntu/spring-app
           cd /home/ubuntu/spring-app
           mvn clean install
-          java -jar target/erp-0.0.1.jar &
+          mvn package
+          java -jar target/erp-0.0.1.jar
 
           git clone https://github.com/shadcn/next-contentlayer.git /home/ubuntu/nextjs-app
           cd /home/ubuntu/nextjs-app
@@ -220,7 +221,7 @@ Resources:
           
           npm install
           npm run build
-          npm run start &
+          npm run start
           
           sudo ufw allow 22
           sudo ufw allow 5432
