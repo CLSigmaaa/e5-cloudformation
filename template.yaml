@@ -233,6 +233,7 @@ Resources:
           sudo firewall-cmd --add-port=3306/tcp --permanent
           sudo firewall-cmd --add-port=8080/tcp --permanent
           sudo firewall-cmd --add-port=3000/tcp --permanent
+          sudo firewall-cmd --add-port=80/tcp --permanent
           sudo firewall-cmd --reload
 
 Outputs:
