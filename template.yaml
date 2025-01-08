@@ -233,5 +233,5 @@ Resources:
 
 Outputs:
   GatewayApiUrl:
-    Description: "API Gateway endpoint"
+    Description: "API Gateway endpoint."
     Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/users"
