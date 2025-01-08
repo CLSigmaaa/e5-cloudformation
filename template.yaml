@@ -149,61 +149,121 @@ Resources:
       RestApiId: !Ref ApiGateway
       StageName: prod
 
+  # MyEC2Instance:
+  #   Type: AWS::EC2::Instance
+  #   Properties:
+  #     InstanceType: t2.micro
+  #     ImageId: ami-0a628e1e89aaedf80
+  #     KeyName: orient
+  #     SecurityGroups:
+  #       - !Ref MySecurityGroup
+  #     Tags:
+  #       - Key: Name
+  #         Value: EC2-SpringNextApp
+  #     UserData:
+  #       Fn::Base64: !Sub |
+  #         #!/bin/bash
+  #         sudo apt update -y && sudo apt upgrade -y
+
+  #         sudo apt install postgresql postgresql-contrib -y
+  #         sudo systemctl start postgresql
+  #         sudo systemctl enable postgresql
+          
+  #         sudo apt install -y git-all
+
+  #         sudo -u postgres psql <<EOF
+  #         CREATE DATABASE myappdb;
+  #         CREATE USER myappuser WITH ENCRYPTED PASSWORD 'mypassword';
+  #         GRANT ALL PRIVILEGES ON DATABASE myappdb TO myappuser;
+  #         EOF
+
+  #         sudo apt install openjdk-17-jdk maven -y
+
+  #         git clone https://github.com/CLSigmaaa/AWS-ERP-FORK.git /home/ubuntu/spring-app
+  #         cd /home/ubuntu/spring-app
+  #         mvn clean install
+  #         mvn package
+  #         java -jar target/erp-0.0.1.jar
+
+  #         git clone https://github.com/shadcn/next-contentlayer.git /home/ubuntu/nextjs-app
+  #         cd /home/ubuntu/nextjs-app
+          
+  #         curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+  #         sudo apt-get install -y nodejs
+  #         sudo apt-get install -y npm
+
+  #         sudo npm install -g pm2
+          
+  #         sudo npm install
+  #         sudo npm run build
+  #         sudo pm2 start npm --name "nextjs-app" -- start
+  #         sudo pm2 save
+          
+  #         sudo ufw allow 22
+  #         sudo ufw allow 5432
+  #         sudo ufw allow 8080
+  #         sudo ufw allow 3000
+  #         sudo ufw --force enable
+
   MyEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      InstanceType: t2.micro
-      ImageId: ami-0a628e1e89aaedf80
+      InstanceType: t2.medium
       KeyName: orient
-      SecurityGroups:
+      ImageId: ami-0e54671bdf3c8ed8d  
+      SecurityGroupIds:
         - !Ref MySecurityGroup
       Tags:
         - Key: Name
-          Value: EC2-SpringNextApp
+          Value: EC2-Next-Spring-App
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          sudo apt update -y && sudo apt upgrade -y
 
-          sudo apt install postgresql postgresql-contrib -y
-          sudo systemctl start postgresql
-          sudo systemctl enable postgresql
-          
-          sudo apt install -y git-all
+          sudo yum update -y
 
-          sudo -u postgres psql <<EOF
-          CREATE DATABASE myappdb;
-          CREATE USER myappuser WITH ENCRYPTED PASSWORD 'mypassword';
-          GRANT ALL PRIVILEGES ON DATABASE myappdb TO myappuser;
+          sudo dnf install mariadb105-server -y
+          sudo systemctl start mariadb
+          sudo systemctl enable mariadb
+
+          mysql -u root <<EOF
+          CREATE DATABASE erp;
+          CREATE USER 'erp_user'@'localhost' IDENTIFIED BY 'erp_pass';
+          GRANT ALL PRIVILEGES ON erp.* TO 'erp_user'@'localhost';
+          FLUSH PRIVILEGES;
           EOF
 
-          sudo apt install openjdk-17-jdk maven -y
+          sudo yum install git -y
 
-          git clone https://github.com/CLSigmaaa/AWS-ERP-FORK.git /home/ubuntu/spring-app
-          cd /home/ubuntu/spring-app
+          sudo amazon-linux-extras enable corretto
+          
+          sudo yum install maven -y
+
+          git clone https://github.com/NeoOniX/AWS-ERP.git /home/ec2-user/erp-java-app
+          cd /home/ec2-user/erp-java-app
           mvn clean install
           mvn package
-          java -jar target/erp-0.0.1.jar
+          java -jar target/erp-0.0.1.jar &
 
-          git clone https://github.com/shadcn/next-contentlayer.git /home/ubuntu/nextjs-app
-          cd /home/ubuntu/nextjs-app
-          
-          curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-          sudo apt-get install -y nodejs
-          sudo apt-get install -y npm
-
+          curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+          sudo yum install nodejs -y
           sudo npm install -g pm2
-          
+
+          git clone https://github.com/NeoOniX/AWS-ERP-Front.git /home/ec2-user/erp-nextjs-app
+          cd /home/ec2-user/erp-nextjs-app
           sudo npm install
           sudo npm run build
-          sudo pm2 start npm --name "nextjs-app" -- start
-          sudo pm2 save
-          
-          sudo ufw allow 22
-          sudo ufw allow 5432
-          sudo ufw allow 8080
-          sudo ufw allow 3000
-          sudo ufw --force enable
+          pm2 start "npm run start" --name "ERP-Front" --watch
+          pm2 save
+
+          sudo yum install firewalld -y
+          sudo systemctl start firewalld
+          sudo systemctl enable firewalld
+          sudo firewall-cmd --add-port=22/tcp --permanent
+          sudo firewall-cmd --add-port=3306/tcp --permanent
+          sudo firewall-cmd --add-port=8080/tcp --permanent
+          sudo firewall-cmd --add-port=3000/tcp --permanent
+          sudo firewall-cmd --reload
 
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
