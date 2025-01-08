@@ -176,7 +176,7 @@ Resources:
     Properties:
       InstanceType: t2.medium
       KeyName: SaMarchePa
-      ImageId: ami-0e54671bdf3c8ed8d  
+      ImageId: ami-0e54671bdf3c8ed8d
       SecurityGroupIds:
         - !Ref MySecurityGroup
       Tags:
@@ -214,7 +214,7 @@ Resources:
           curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
           sudo yum install nodejs -y
           sudo npm install -g pm2
-
+          
           git clone https://github.com/NeoOniX/AWS-ERP-Front.git /home/ec2-user/erp-nextjs-app
           cd /home/ec2-user/erp-nextjs-app
           sudo npm install
