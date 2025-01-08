@@ -149,17 +149,39 @@ Resources:
       RestApiId: !Ref ApiGateway
       StageName: prod
 
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Prout
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: 0.0.0.0/0
+
   MyEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.medium
-      KeyName: orient
+      KeyName: SaMarchePa
       ImageId: ami-0e54671bdf3c8ed8d  
       SecurityGroupIds:
         - !Ref MySecurityGroup
       Tags:
         - Key: Name
-          Value: EC2-Next-Spring-App
+          Value: EC2GT
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
@@ -208,29 +230,6 @@ Resources:
           sudo firewall-cmd --add-port=8080/tcp --permanent
           sudo firewall-cmd --add-port=3000/tcp --permanent
           sudo firewall-cmd --reload
-
-  MySecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Security group for Spring Boot, Next.js, and PostgreSQL
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 5432
-          ToPort: 5432
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 8080
-          ToPort: 8080
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 3000
-          ToPort: 3000
-          CidrIp: 0.0.0.0/0
-
 
 Outputs:
   GatewayApiUrl:
