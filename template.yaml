@@ -35,11 +35,11 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
+                  - dynamodb:Scan
                   - dynamodb:PutItem
                   - dynamodb:GetItem
                   - dynamodb:UpdateItem
                   - dynamodb:Query
-                  - dynamodb:Scan
                 Resource: "*"
 
   MyLambdaFunction:
