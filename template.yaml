@@ -149,62 +149,6 @@ Resources:
       RestApiId: !Ref ApiGateway
       StageName: prod
 
-  # MyEC2Instance:
-  #   Type: AWS::EC2::Instance
-  #   Properties:
-  #     InstanceType: t2.micro
-  #     ImageId: ami-0a628e1e89aaedf80
-  #     KeyName: orient
-  #     SecurityGroups:
-  #       - !Ref MySecurityGroup
-  #     Tags:
-  #       - Key: Name
-  #         Value: EC2-SpringNextApp
-  #     UserData:
-  #       Fn::Base64: !Sub |
-  #         #!/bin/bash
-  #         sudo apt update -y && sudo apt upgrade -y
-
-  #         sudo apt install postgresql postgresql-contrib -y
-  #         sudo systemctl start postgresql
-  #         sudo systemctl enable postgresql
-          
-  #         sudo apt install -y git-all
-
-  #         sudo -u postgres psql <<EOF
-  #         CREATE DATABASE myappdb;
-  #         CREATE USER myappuser WITH ENCRYPTED PASSWORD 'mypassword';
-  #         GRANT ALL PRIVILEGES ON DATABASE myappdb TO myappuser;
-  #         EOF
-
-  #         sudo apt install openjdk-17-jdk maven -y
-
-  #         git clone https://github.com/CLSigmaaa/AWS-ERP-FORK.git /home/ubuntu/spring-app
-  #         cd /home/ubuntu/spring-app
-  #         mvn clean install
-  #         mvn package
-  #         java -jar target/erp-0.0.1.jar
-
-  #         git clone https://github.com/shadcn/next-contentlayer.git /home/ubuntu/nextjs-app
-  #         cd /home/ubuntu/nextjs-app
-          
-  #         curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-  #         sudo apt-get install -y nodejs
-  #         sudo apt-get install -y npm
-
-  #         sudo npm install -g pm2
-          
-  #         sudo npm install
-  #         sudo npm run build
-  #         sudo pm2 start npm --name "nextjs-app" -- start
-  #         sudo pm2 save
-          
-  #         sudo ufw allow 22
-  #         sudo ufw allow 5432
-  #         sudo ufw allow 8080
-  #         sudo ufw allow 3000
-  #         sudo ufw --force enable
-
   MyEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
@@ -287,9 +231,13 @@ Resources:
           ToPort: 3000
           CidrIp: 0.0.0.0/0
 
-  
-
 Outputs:
-  ApiUrl:
+  GatewayApiUrl:
     Description: "API Gateway endpoint"
     Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/users"
+  ErpFrontUrl:
+    Description: "ERP Front URL"
+    Value: !GetAtt MyEC2Instance.PublicDnsName
+  ErpBackUrl:
+    Description: "ERP Back URL"
+    Value: !Sub "http://${MyEC2Instance.PublicDnsName}:8080"
