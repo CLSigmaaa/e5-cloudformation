@@ -235,9 +235,3 @@ Outputs:
   GatewayApiUrl:
     Description: "API Gateway endpoint"
     Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/users"
-  ErpFrontUrl:
-    Description: "ERP Front URL"
-    Value: !GetAtt MyEC2Instance.PublicDnsName
-  ErpBackUrl:
-    Description: "ERP Back URL"
-    Value: !Sub "http://${MyEC2Instance.PublicDnsName}:8080"
